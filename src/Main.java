@@ -6,10 +6,11 @@ public class Main {
 
         FileParser parser = new FileParser("http://www.rentalcars.com/js/vehicles.json");
         ArrayList<Vehicle> vehicles = parser.getVehicles();
-//        for (Vehicle car: vehicles) {
-//            System.out.println(car.getCarName());
-//        }
-        DataRetriever dr = new DataRetriever();
-        dr.printVehicleNamesAndPrices(vehicles);
+        DataRetriever retriever = new DataRetriever(vehicles);
+        //retriever.printVehicleNamesAndPrices();
+        //retriever.printVehicleSpecifications();
+        //retriever.printRankedVehicleSuppliers();
+        retriever.printOverallScoring();
     }
+
 }
