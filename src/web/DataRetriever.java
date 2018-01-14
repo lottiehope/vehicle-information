@@ -7,7 +7,7 @@ import java.util.Comparator;
 
 public class DataRetriever {
 
-    VehicleSpecification vehicleInfoSource = new VehicleSpecification();
+    VehicleSpecification vehicleInfoSource = new VehicleSpecification("resources/VehicleDetails.json");
     ArrayList<Vehicle> vehicles = new ArrayList<>();
     JSONArray allVehicleSpecifications = new JSONArray();
 

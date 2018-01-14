@@ -13,14 +13,14 @@ public class VehicleSpecification {
     private final String TRANSMISSION   =   "Transmission";
     private final String FUEL           =   "FuelAirCon";
 
-    public VehicleSpecification() {
-        getFullVehicleSpecifications();
+    public VehicleSpecification(String fileSource) {
+        getFullVehicleSpecifications(fileSource);
     }
 
-    public void getFullVehicleSpecifications() {
+    public void getFullVehicleSpecifications(String fileSource) {
         FileReader reader = null;
         try {
-            reader = new FileReader("resources/VehicleDetails.json");
+            reader = new FileReader(fileSource);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
