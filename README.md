@@ -26,7 +26,7 @@ You can comment these out in the ```Main.java``` class.
 
 ### Accessing the API: 
 
-Once the project is running, open a browser and navigate to localhost:8080.
+Once the project is running, open a browser and type localhost:8080/vehicle.
 
 In order to run the four tasks, add the following to the URL:
 
