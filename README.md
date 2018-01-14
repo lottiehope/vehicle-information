@@ -16,13 +16,15 @@ NB: Overall score = Supplier rating + Car rating (A score based on transmission 
 
 ## Running the project
 
-To print to console:
+This project runs and prints to the console and can be accessed via web API which uses the Spring framework.
+
+### To print to console:
 
 Open the project and run it. This will print out each one of the tasks to the console.
 
 You can comment these out in the ```Main.java``` class.
 
-Accessing the API: 
+### Accessing the API: 
 
 Once the project is running, open a browser and navigate to localhost:8080.
 
