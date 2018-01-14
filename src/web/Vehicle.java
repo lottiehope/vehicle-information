@@ -1,10 +1,13 @@
 package web;
 
 import org.json.JSONObject;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+
+/**
+ * Class to define a single vehicle and all information associated with it.
+ * */
 public class Vehicle {
 
     private String carName;
@@ -20,7 +23,11 @@ public class Vehicle {
     private int score = 0;
     private double overallScore;
 
+    /**
+     * Initialise a vehicle and define the information that was provided in the JSON file retrieved from the URL.
+     * */
     public Vehicle(JSONObject car) {
+
         this.carName = car.getString("name");
         this.sipp = car.getString("sipp");
         this.price = new BigDecimal(car.getDouble("price"));
@@ -28,6 +35,7 @@ public class Vehicle {
         this.supplier = car.getString("supplier");
         this.rating = car.getDouble("rating");
         overallScore = rating;
+
     }
 
     public String getCarName() {
@@ -70,25 +78,40 @@ public class Vehicle {
         return AC;
     }
 
-    public void addSpecifications(String type, String noOfDoors, String transmissionType, String[] fuelAC, int increase) {
+    public int getScore() {
+        return score;
+    }
+
+    public double getOverallScore() {
+        return overallScore;
+    }
+
+    /**
+     * Functionality to add the vehicle information found when investigating the vehicle's sipp.
+     * More information on sipp breakdown can be seen in /resources/VehicleDetails.json
+     * @param type              The vehicle type.
+     * @param noOfDoors         The number of doors or type the vehicle has.
+     * @param transmissionType  The transmission of the vehicle.
+     * @param fuelAC            What fuel the vehicle takes and whether it has AC or not
+     * @param increase          How much the vehicle scored based on transmission and AC.
+     * */
+    protected void addSpecifications(String type, String noOfDoors, String transmissionType, String[] fuelAC, int increase) {
+
         carType = type;
         doors = noOfDoors;
         transmission = transmissionType;
         fuel = fuelAC[0];
         AC = fuelAC[1];
         addToScore(increase);
+
     }
 
-    public int getScore() {
-        return score;
-    }
+    /**
+     * Called when the vehicle's score has been calculated so it can update the overall score.
+     * @param increase How much the vehicle scored based on transmission and AC.
+     * */
+    protected void addToScore(int increase) {
 
-    public double getOverallScore() {
-
-        return overallScore;
-    }
-
-    public void addToScore(int increase) {
         score = score + increase;
         overallScore = overallScore + score;
 
