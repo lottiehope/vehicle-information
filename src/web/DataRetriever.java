@@ -1,57 +1,74 @@
 package web;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 public class DataRetriever {
 
     VehicleSpecification vehicleInfoSource = new VehicleSpecification();
     ArrayList<Vehicle> vehicles = new ArrayList<>();
-    ArrayList<String> allCarDetails = new ArrayList<>();
+    JSONArray allVehicleSpecifications = new JSONArray();
 
     public DataRetriever(ArrayList<Vehicle> vehiclesList) {
         vehicles = vehiclesList;
         setSpecifications();
     }
 
-    //Task 1
-    public void printVehicleNamesAndPrices() {
-        ArrayList<String> namesAndPrices = new ArrayList<>();
+    public JSONArray getVehicleNamesAndPrices() {
+        JSONArray namesAndPrices = new JSONArray();
+        vehicles.sort(Comparator.comparing(Vehicle::getCarName));
         for (Vehicle car: vehicles) {
-            String nameAndPrice = car.getCarName() + " - " + car.getPrice().toString();
-            namesAndPrices.add(nameAndPrice);
+            JSONObject nameAndPrice = new JSONObject();
+            nameAndPrice.put("Name", car.getCarName());
+            nameAndPrice.put("Price", car.getPrice());
+            namesAndPrices.put(nameAndPrice);
         }
-        Collections.sort(namesAndPrices);
-        for (String s: namesAndPrices) {
-            System.out.println(s);
+        return namesAndPrices;
+    }
+
+    public void printVehicleNamesAndPrices() {
+        JSONArray vehiclePrices = getVehicleNamesAndPrices();
+        for (Object car: vehiclePrices) {
+            JSONObject JSONCar = (JSONObject)car;
+            System.out.println(JSONCar.get("Name") + " - " + JSONCar.get("Price"));
         }
     }
 
     public void printVehicleSpecifications() {
-        for (String details : allCarDetails) {
-            System.out.println(details);
+        for (Object car: allVehicleSpecifications) {
+            JSONObject JSONCar = (JSONObject)car;
+            System.out.println(JSONCar.get("Name") + " - " + JSONCar.get("Sipp") + " - " + JSONCar.get("CarType") +
+                    " - " + JSONCar.get("Doors") + " - " + JSONCar.get("Transmission") + " - " + JSONCar.get("Fuel")
+                    + " - " + JSONCar.get("AC"));
         }
 
     }
 
     public void setSpecifications() {
-        ArrayList<String> carDetails = new ArrayList<>();
         for (Vehicle car : vehicles) {
             String[] sipp = car.getSipp().split("");
-            carDetails.add(car.getCarName());
-            carDetails.add(car.getSipp());
-            carDetails.add(vehicleInfoSource.getVehicleType(sipp[0]));
-            carDetails.add(vehicleInfoSource.getVehicleDoors(sipp[1]));
-            carDetails.add(vehicleInfoSource.getVehicleTransmission(sipp[2]));
             String[] fuelAndAC = vehicleInfoSource.getVehicleFuelAndAC(sipp[3]);
-            carDetails.add(fuelAndAC[0]);
-            carDetails.add(fuelAndAC[1]);
-            int score = setVehicleScore(carDetails.get(4), fuelAndAC[1]);
-            car.addSpecifications(carDetails.get(2),carDetails.get(3), carDetails.get(4), fuelAndAC, score);
-            allCarDetails.add(String.join(" - ", carDetails));
-            carDetails.clear();
+            String type = vehicleInfoSource.getVehicleType(sipp[0]);
+            String doors = vehicleInfoSource.getVehicleDoors(sipp[1]);
+            String transmission = vehicleInfoSource.getVehicleTransmission(sipp[2]);
+            JSONObject vehicle = new JSONObject();
+            vehicle.put("Name", car.getCarName());
+            vehicle.put("Sipp", car.getSipp());
+            vehicle.put("CarType", type);
+            vehicle.put("Doors", doors);
+            vehicle.put("Transmission", transmission);
+            vehicle.put("Fuel", fuelAndAC[0]);
+            vehicle.put("AC", fuelAndAC[1]);
+            allVehicleSpecifications.put(vehicle);
+            int score = setVehicleScore(transmission, fuelAndAC[1]);
+            car.addSpecifications(type, doors, transmission, fuelAndAC, score);
         }
+    }
+
+    public JSONArray getAllVehicleSpecifications() {
+        return allVehicleSpecifications;
     }
 
     public int setVehicleScore(String transmission, String AC) {
@@ -68,27 +85,56 @@ public class DataRetriever {
     }
 
     public void printRankedVehicleSuppliers() {
-        ArrayList<String> carTypes = new ArrayList<>();
-        vehicles.sort(Comparator.comparingDouble(Vehicle::getRating).reversed());
-        for (Vehicle vehicle : vehicles) {
-            String currentType = vehicle.getCarType();
-            if(!carTypes.contains(currentType)){
-                System.out.println(vehicle.getCarName() + " - " + currentType + " - " +
-                                       vehicle.getSupplier() + " - " + vehicle.getRating());
-                carTypes.add(currentType);
-            } }
-
-    }
-
-    public void printOverallScoring() {
-        vehicles.sort(Comparator.comparingDouble(Vehicle::getOverallScore).reversed());
-        for(Vehicle vehicle : vehicles) {
-            System.out.println(vehicle.getCarName() + " - " + vehicle.getScore() + " - " +
-             vehicle.getRating() + " - " + vehicle.getOverallScore());
+        JSONArray ratedVehicles = getRankedVehicleSuppliers();
+        for(Object car : ratedVehicles) {
+            JSONObject vehicle = (JSONObject) car;
+            System.out.println(vehicle.get("Name") + " - " + vehicle.get("Type") + " - " + vehicle.get("Supplier") +
+                " - " + vehicle.get("Rating"));
         }
 
     }
 
-    //Task 4
+    public JSONArray getRankedVehicleSuppliers() {
+        vehicles.sort(Comparator.comparing(Vehicle::getRating).reversed());
+        ArrayList<String> carTypes = new ArrayList<>();
+        JSONArray ratedVehicles = new JSONArray();
+        for (Vehicle vehicle : vehicles) {
+            String currentType = vehicle.getCarType();
+            if(!carTypes.contains(currentType)) {
+                JSONObject car = new JSONObject();
+                car.put("Name", vehicle.getCarName());
+                car.put("Type", currentType);
+                car.put("Supplier", vehicle.getSupplier());
+                car.put("Rating", vehicle.getRating());
+                carTypes.add(currentType);
+                ratedVehicles.put(car);
+            }
+        }
+        return ratedVehicles;
+    }
+
+    public JSONArray getOverallScoring() {
+        vehicles.sort(Comparator.comparingDouble(Vehicle::getOverallScore).reversed());
+        JSONArray allOverallScores = new JSONArray();
+        for(Vehicle vehicle : vehicles) {
+            JSONObject car = new JSONObject();
+            car.put("Name", vehicle.getCarName());
+            car.put("Score", vehicle.getScore());
+            car.put("SupplierRating", vehicle.getRating());
+            car.put("OverallRating", vehicle.getOverallScore());
+            allOverallScores.put(car);
+        }
+        return allOverallScores;
+    }
+
+    public void printOverallScoring() {
+        JSONArray allVehicles = getOverallScoring();
+        for(Object car : allVehicles) {
+            JSONObject vehicle = (JSONObject) car;
+            System.out.println(vehicle.get("Name") + " - " + vehicle.get("Score") + " - " + vehicle.get("SupplierRating")
+                    + " - " + vehicle.get("OverallRating"));
+        }
+
+    }
 
 }
